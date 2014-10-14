@@ -1,5 +1,8 @@
 package com.hanselandpetal.catalog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,8 +15,9 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity
 {
-	ProgressBar progressBar;
-	TextView	output;
+	ProgressBar		progressBar;
+	TextView		output;
+	List<MyTask>	tasks;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -27,6 +31,8 @@ public class MainActivity extends Activity
 		
 		progressBar = (ProgressBar) findViewById(R.id.progressBar1);
 		progressBar.setVisibility(View.INVISIBLE);
+		
+		tasks = new ArrayList<>();
 		
 	}
 	
@@ -60,14 +66,20 @@ public class MainActivity extends Activity
 		@Override
 		protected void onPreExecute()
 		{
-			progressBar.setVisibility(View.VISIBLE);
+			
 			updateDisplay("Starting Task");
+			
+			if (tasks.size() == 0)
+			{
+				progressBar.setVisibility(View.VISIBLE);
+			}
+			tasks.add(this);
 		}
-
+		
 		@Override
 		protected String doInBackground(String... params)
 		{
-			for(int i=0; i< params.length; i++)
+			for (int i = 0; i < params.length; i++)
 			{
 				
 				try
@@ -93,14 +105,18 @@ public class MainActivity extends Activity
 			
 		}
 		
-		
-		
-		
 		@Override
 		protected void onPostExecute(String result)
 		{
 			updateDisplay(result);
-			progressBar.setVisibility(View.INVISIBLE);
+			
+			
+			tasks.remove(this);
+			if(tasks.size() == 0)
+			{
+				progressBar.setVisibility(View.INVISIBLE);	
+			}
+			
 		}
 	}
 	
