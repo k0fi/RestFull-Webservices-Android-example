@@ -43,7 +43,8 @@ public class MainActivity extends Activity
 		if (item.getItemId() == R.id.action_do_task)
 		{
 			MyTask task = new MyTask();
-			task.execute("Param 1", "Param 2", "Param 3");
+			// This is for parralel tasks
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Param 1", "Param 2", "Param 3");
 		}
 		return false;
 	}
