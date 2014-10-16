@@ -57,7 +57,7 @@ public class MainActivity extends Activity
 		{
 			if (isOnline())
 			{
-				requestData("http://services.hanselandpetal.com/feeds/flowers.xml");
+				requestData("http://services.hanselandpetal.com/feeds/flowers.json");
 			}
 			else
 			{
