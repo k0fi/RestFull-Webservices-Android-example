@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hanselandpetal.catalog.model.Flower;
+import com.hanselandpetal.catalog.parser.FlowerJSONParser;
 
 import android.app.Activity;
 import android.content.Context;
@@ -73,9 +74,16 @@ public class MainActivity extends Activity
 		task.execute(uri);
 	}
 	
-	protected void updateDisplay(String message)
+	protected void updateDisplay()
 	{
-		output.append(message + "\n");
+		if(flowerList != null)
+		{
+			for (Flower flower: flowerList)
+			{
+				output.append(flower.getName() + "\n");
+			}
+		}
+		
 	}
 	
 	// To Check network connectivity is available
@@ -98,7 +106,7 @@ public class MainActivity extends Activity
 		protected void onPreExecute()
 		{
 			
-			updateDisplay("Starting Task");
+			updateDisplay();
 			
 			if (tasks.size() == 0)
 			{
@@ -119,14 +127,15 @@ public class MainActivity extends Activity
 		@Override
 		protected void onProgressUpdate(String... values)
 		{
-			updateDisplay(values[0]);
+			updateDisplay();
 			
 		}
 		
 		@Override
 		protected void onPostExecute(String result)
 		{
-			updateDisplay(result);
+			flowerList = FlowerJSONParser.parseFeed(result); 
+			updateDisplay();
 			
 			tasks.remove(this);
 			if (tasks.size() == 0)
