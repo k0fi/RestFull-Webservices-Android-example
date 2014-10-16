@@ -53,7 +53,7 @@ public class MainActivity extends Activity
 		if (item.getItemId() == R.id.action_do_task)
 		{
 			if(isOnline()) {
-				requestData();
+				requestData("http://services.hanselandpetal.com/feeds/flowers.xml");
 			}
 			else
 			{
@@ -63,11 +63,10 @@ public class MainActivity extends Activity
 		return false;
 	}
 
-	private void requestData()
+	private void requestData(String uri)
 	{
 		MyTask task = new MyTask();
-		// This is for parralel tasks
-		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Param 1", "Param 2", "Param 3");
+		task.execute(uri);
 	}
 	
 	protected void updateDisplay(String message)
@@ -108,23 +107,10 @@ public class MainActivity extends Activity
 		@Override
 		protected String doInBackground(String... params)
 		{
-			for (int i = 0; i < params.length; i++)
-			{
-				
-				try
-				{
-					
-					// It is used to update UI.
-					publishProgress("Working with: " + params[i]);
-					Thread.sleep(1000);
-				}
-				catch (InterruptedException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			return "Finishing Task";
+			// The uri passed will be the first parameter
+			String content = HTTPManager.getData(params[0]);
+			
+			return content;
 		}
 		
 		@Override
