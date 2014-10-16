@@ -3,6 +3,8 @@ package com.hanselandpetal.catalog;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hanselandpetal.catalog.model.Flower;
+
 import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -22,6 +24,7 @@ public class MainActivity extends Activity
 	ProgressBar		progressBar;
 	TextView		output;
 	List<MyTask>	tasks;
+	List<Flower>	flowerList;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -52,7 +55,8 @@ public class MainActivity extends Activity
 	{
 		if (item.getItemId() == R.id.action_do_task)
 		{
-			if(isOnline()) {
+			if (isOnline())
+			{
 				requestData("http://services.hanselandpetal.com/feeds/flowers.xml");
 			}
 			else
@@ -62,7 +66,7 @@ public class MainActivity extends Activity
 		}
 		return false;
 	}
-
+	
 	private void requestData(String uri)
 	{
 		MyTask task = new MyTask();
@@ -74,13 +78,12 @@ public class MainActivity extends Activity
 		output.append(message + "\n");
 	}
 	
-	
 	// To Check network connectivity is available
 	protected boolean isOnline()
 	{
-		ConnectivityManager cm= (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
-		if(netInfo != null  && netInfo.isConnectedOrConnecting())
+		if (netInfo != null && netInfo.isConnectedOrConnecting())
 		{
 			return true;
 		}
@@ -125,11 +128,10 @@ public class MainActivity extends Activity
 		{
 			updateDisplay(result);
 			
-			
 			tasks.remove(this);
-			if(tasks.size() == 0)
+			if (tasks.size() == 0)
 			{
-				progressBar.setVisibility(View.INVISIBLE);	
+				progressBar.setVisibility(View.INVISIBLE);
 			}
 			
 		}
