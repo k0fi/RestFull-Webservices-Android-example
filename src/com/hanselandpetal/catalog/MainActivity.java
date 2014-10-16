@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -12,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity
 {
@@ -48,16 +52,41 @@ public class MainActivity extends Activity
 	{
 		if (item.getItemId() == R.id.action_do_task)
 		{
-			MyTask task = new MyTask();
-			// This is for parralel tasks
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Param 1", "Param 2", "Param 3");
+			if(isOnline()) {
+				requestData();
+			}
+			else
+			{
+				Toast.makeText(this, "No data connection available", Toast.LENGTH_LONG).show();
+			}
 		}
 		return false;
+	}
+
+	private void requestData()
+	{
+		MyTask task = new MyTask();
+		// This is for parralel tasks
+		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "Param 1", "Param 2", "Param 3");
 	}
 	
 	protected void updateDisplay(String message)
 	{
 		output.append(message + "\n");
+	}
+	
+	
+	// To Check network connectivity is available
+	protected boolean isOnline()
+	{
+		ConnectivityManager cm= (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo netInfo = cm.getActiveNetworkInfo();
+		if(netInfo != null  && netInfo.isConnectedOrConnecting())
+		{
+			return true;
+		}
+		return false;
+		
 	}
 	
 	public class MyTask extends AsyncTask<String, String, String>
