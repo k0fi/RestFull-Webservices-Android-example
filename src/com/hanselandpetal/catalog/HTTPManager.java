@@ -1,36 +1,53 @@
 package com.hanselandpetal.catalog;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
-
-import android.net.http.AndroidHttpClient;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class HTTPManager
 {
 	// A method to get the data from the URI
 	public static String getData(String uri)
 	{
-		AndroidHttpClient client = AndroidHttpClient.newInstance("AndroidAgent");
-		HttpGet request = new HttpGet(uri);
-		HttpResponse response;
 		
+		BufferedReader reader = null;
 		try
 		{
-			// Sending the request to server and getting back the respnse object
-			response = client.execute(request);
-			return EntityUtils.toString(response.getEntity());
+			URL url = new URL(uri);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			StringBuilder sb = new StringBuilder();
+			reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null)
+			{
+				sb.append(line + "\n");
+			}
+			
+			return sb.toString();
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			
 			return null;
 		}
 		finally
 		{
-			// To prevent the leak we need to close the client
-			client.close();
+			if (reader != null)
+			{
+				try
+				{
+					reader.close();
+				}
+				catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return null;
+				}
+			}
 		}
-		
 	}
 }
