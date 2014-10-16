@@ -58,7 +58,7 @@ public class MainActivity extends Activity
 		{
 			if (isOnline())
 			{
-				requestData("http://services.hanselandpetal.com/feeds/flowers.json");
+				requestData("http://services.hanselandpetal.com/secure/flowers.json");
 			}
 			else
 			{
@@ -76,9 +76,9 @@ public class MainActivity extends Activity
 	
 	protected void updateDisplay()
 	{
-		if(flowerList != null)
+		if (flowerList != null)
 		{
-			for (Flower flower: flowerList)
+			for (Flower flower : flowerList)
 			{
 				output.append(flower.getName() + "\n");
 			}
@@ -119,7 +119,7 @@ public class MainActivity extends Activity
 		protected String doInBackground(String... params)
 		{
 			// The uri passed will be the first parameter
-			String content = HTTPManager.getData(params[0]);
+			String content = HTTPManager.getData(params[0], "feeduser", "feedpassword");
 			
 			return content;
 		}
@@ -134,14 +134,21 @@ public class MainActivity extends Activity
 		@Override
 		protected void onPostExecute(String result)
 		{
-			flowerList = FlowerJSONParser.parseFeed(result); 
-			updateDisplay();
 			
 			tasks.remove(this);
 			if (tasks.size() == 0)
 			{
 				progressBar.setVisibility(View.INVISIBLE);
+			} 
+			
+			if(result == null)
+			{
+				Toast.makeText(MainActivity.this, "Cannot connect to webservice.", Toast.LENGTH_LONG).show();
+				return;
 			}
+			
+			flowerList = FlowerJSONParser.parseFeed(result);
+			updateDisplay();
 			
 		}
 	}
