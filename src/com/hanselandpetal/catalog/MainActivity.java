@@ -1,10 +1,14 @@
 package com.hanselandpetal.catalog;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -22,11 +26,13 @@ import com.hanselandpetal.catalog.parser.FlowerJSONParser;
 public class MainActivity extends ListActivity
 {
 	
-	TextView		output;
-	ProgressBar		pb;
-	List<MyTask>	tasks;
+	private static final String	PHOTO_BASE_URL	= "http://services.hanselandpetal.com/photos/";
 	
-	List<Flower>	flowerList;
+	TextView					output;
+	ProgressBar					pb;
+	List<MyTask>				tasks;
+	
+	List<Flower>				flowerList;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -90,7 +96,7 @@ public class MainActivity extends ListActivity
 		}
 	}
 	
-	private class MyTask extends AsyncTask<String, String, String>
+	private class MyTask extends AsyncTask<String, String, List<Flower>>
 	{
 		
 		@Override
@@ -104,15 +110,35 @@ public class MainActivity extends ListActivity
 		}
 		
 		@Override
-		protected String doInBackground(String... params)
+		protected List<Flower> doInBackground(String... params)
 		{
 			
 			String content = HTTPManager.getData(params[0], "feeduser", "feedpassword");
-			return content;
+			flowerList = FlowerJSONParser.parseFeed(content);
+			
+			for (Flower flower : flowerList)
+			{
+				try
+				{
+					String imageUrl = PHOTO_BASE_URL + flower.getPhotos();
+					InputStream in = (InputStream) new URL(imageUrl).getContent();
+					Bitmap bitmap = BitmapFactory.decodeStream(in);
+					flower.setBitmap(bitmap);
+					in.close();
+							
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+				
+			}
+			
+			return flowerList;
 		}
 		
 		@Override
-		protected void onPostExecute(String result)
+		protected void onPostExecute(List<Flower> result)
 		{
 			
 			tasks.remove(this);
@@ -127,7 +153,6 @@ public class MainActivity extends ListActivity
 				return;
 			}
 			
-			flowerList = FlowerJSONParser.parseFeed(result);
 			updateDisplay();
 			
 		}
